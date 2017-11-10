@@ -2,7 +2,12 @@ class FortuneController < ApplicationController
   before_action :set_fortune, only: [:show]
 
   def index
-    @fortunes = Fortune.all
+    aboutstring = params[:about]
+    if aboutstring.blank?
+      @fortunes = Fortune.all
+    else
+      @fortunes = Fortune.where("fortune LIKE :string", string: "%#{aboutstring}%")
+    end
     render json: @fortunes, status: :ok
   end
 
@@ -18,7 +23,8 @@ class FortuneController < ApplicationController
   def help
     render json: ["Readme:",
                   "/fortune/random: return a random fortune",
-                  "/fortune/n: return the nth fortune"]
+                  "/fortune/n: return the nth fortune",
+                  "/fortune?about=string: search for fortunes about that topic"]
   end
 
   private
@@ -30,6 +36,4 @@ class FortuneController < ApplicationController
   def set_fortune
     @fortune = Fortune.find(params[:id])
   end
-
-
 end
